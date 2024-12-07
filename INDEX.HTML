@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Firebase Example</title>
+</head>
+<body>
+    <!-- Form for user to submit data -->
+    <form id="contactForm">
+        <input type="text" id="fullName" placeholder="Full Name" required>
+        <input type="email" id="email" placeholder="Email" required>
+        <input type="text" id="subject" placeholder="Subject">
+        <textarea id="message" placeholder="Message" required></textarea>
+        <button id="submit" type="button">Submit</button>
+    </form>
+
+    <!-- A paragraph to display the results -->
+    <p id="displayMessage" style="color: blue; font-weight: bold;"></p>
+
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-analytics.js";
+        import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-database.js";
+
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyCT9hwCrbp_xrRXSBdiSP-fCYnS3zfIla8",
+            authDomain: "confusion-fd806.firebaseapp.com",
+            databaseURL: "https://confusion-fd806-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "confusion-fd806",
+            storageBucket: "confusion-fd806.firebasestorage.app",
+            messagingSenderId: "1008827131158",
+            appId: "1:1008827131158:web:0d77d1fcdc9c733e1f5c37",
+            measurementId: "G-EJ7W0P9ZDV"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+        const database = getDatabase(app);
+    </script>
+    
+    <!-- Custom JavaScript to handle form submission -->
+    <script>
+        document.getElementById('submit').addEventListener('click', function() {
+            // Get form values
+            const name = document.getElementById('fullName').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const subject = document.getElementById('subject').value.trim();
+            const message = document.getElementById('message').value.trim();
+
+            // Validate required fields
+            if (!name || !email || !message) {
+                alert('Please fill out all required fields.');
+                return;
+            }
+
+            // Save data to Firebase Realtime Database
+            const newMessageRef = ref(database, 'messages/' + Date.now()); // Using timestamp as unique ID
+            set(newMessageRef, {
+                name: name,
+                email: email,
+                subject: subject,
+                message: message,
+                timestamp: new Date().toISOString()
+            }).then(() => {
+                alert('Message sent successfully!');
+                // Optionally, display the message on the page or in console
+                document.getElementById('displayMessage').textContent = `Thank you, ${name}! Your message has been sent.`;
+                // Clear form fields
+                document.getElementById('contactForm').reset();
+            }).catch((error) => {
+                console.error('Error saving message:', error);
+            });
+        });
+    </script>
+</body>
+</html>
